@@ -25,6 +25,7 @@ import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Debug;
 import android.os.Debug.MemoryInfo;
 import android.os.Environment;
@@ -77,6 +78,7 @@ public class ServiceReader extends Service {
 	private BufferedWriter mW;
 	private File mFile;
 	private SharedPreferences mPrefs;
+	private ArrayList<String> mPackageName ;
 	private Runnable readRunnable = new Runnable() { // http://docs.oracle.com/javase/8/docs/technotes/guides/concurrency/threadPrimitiveDeprecation.html
 		@Override   
 		public void run() {
@@ -84,7 +86,6 @@ public class ServiceReader extends Service {
 			// However the ViewGraphic is drawed with a Handler because the drawing code must be executed in the UI thread.
 			Thread thisThread = Thread.currentThread();
 			while (readThread == thisThread) {
-				read();
 				PackageManager pm = getPackageManager();
 				List<ActivityManager.RunningAppProcessInfo> runningAppProcesses = ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).getRunningAppProcesses();
 				if (runningAppProcesses != null) {
@@ -98,6 +99,10 @@ public class ServiceReader extends Service {
 							} catch (Resources.NotFoundException e) {
 							}
 							if(mListSelected!=null){
+								while(mPackageName.size()>0){
+									mListSelected.add(ActivityProcesses.mapDataForPlacesList(true, mPackageName.get(0), "-2",mPackageName.get(0),mPackageName.get(0)));
+									mPackageName.remove(0);
+								}
 								for (int i = 0; i < mListSelected.size(); i++) {
 									if(mListSelected.get(i).get(C.pDead)!=null){
 										if(mListSelected.get(i).get(C.pPackage).equals(p.pkgList[0])){
@@ -105,13 +110,13 @@ public class ServiceReader extends Service {
 										}
 										mListSelected.get(i).remove(C.pDead);
 									}
-
 								}
 							}
 //							mListSelected.add(ActivityProcesses.mapDataForPlacesList(false, name, String.valueOf(p.pid), p.pkgList[0], p.processName));
 						}
 					}
 				}
+				read();
 				try {
 					Thread.sleep(intervalRead);
 /*					synchronized (this) {
@@ -140,6 +145,21 @@ public class ServiceReader extends Service {
     private BroadcastReceiver receiverStartRecord = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+			Bundle bundle = intent.getExtras();
+			if(bundle != null && bundle.containsKey("pkgName"))
+			{
+				Log.d("name",bundle.getString("pkgName"));
+				String[] packageName = bundle.getString("pkgName").split(" ");
+				for (int i = 0; i < packageName.length; i++) {
+					mPackageName.add(packageName[i]);
+//					addProcess(ActivityProcesses.mapDataForPlacesList(false,packageName[0],"-2",packageName[0],packageName[0]));
+				}
+//				for (int i = 0; i <packageName.length ; i++) {
+//					Log.d("packageName",packageName[i]);
+//					mListSelected = Collections.synchronizedList(new ArrayList<Map<String, Object>>());
+//					mListSelected.add(ActivityProcesses.mapDataForPlacesList(true,packageName[i],"-2",packageName[i],packageName[i]));
+//				}
+			}
         	startRecord();
         	sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
         }
@@ -181,6 +201,7 @@ public class ServiceReader extends Service {
 		memFree = new ArrayList<String>(maxSamples);
 		cached = new ArrayList<String>(maxSamples);
 		threshold = new ArrayList<String>(maxSamples);
+		mPackageName = new ArrayList<String>();
 		
 		pId = Process.myPid();
 		
@@ -512,7 +533,7 @@ public class ServiceReader extends Service {
 						.append("Total CPU usage (%),AnotherMonitor (Pid ").append(Process.myPid()).append(") CPU usage (%),AnotherMonitor Memory (kB)");
 				if (mListSelected != null && !mListSelected.isEmpty())
 					for (Map<String, Object> p : mListSelected)
-						sb.append(",").append(p.get(C.pAppName)).append(" (Pid ").append(p.get(C.pId)).append(") CPU usage (%)")
+						sb.append(",").append(p.get(C.pAppName)).append(") CPU usage (%)")
 						  .append(",").append(p.get(C.pAppName)).append(" Memory (kB)");
 				
 				sb.append(",,Memory used (kB),Memory available (MemFree+Cached) (kB),MemFree (kB),Cached (kB),Threshold (kB)");
