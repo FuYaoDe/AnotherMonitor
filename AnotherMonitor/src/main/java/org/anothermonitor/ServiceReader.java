@@ -20,6 +20,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Binder;
@@ -83,6 +85,33 @@ public class ServiceReader extends Service {
 			Thread thisThread = Thread.currentThread();
 			while (readThread == thisThread) {
 				read();
+				PackageManager pm = getPackageManager();
+				List<ActivityManager.RunningAppProcessInfo> runningAppProcesses = ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).getRunningAppProcesses();
+				if (runningAppProcesses != null) {
+					int pid = Process.myPid();
+					for (ActivityManager.RunningAppProcessInfo p : runningAppProcesses) {
+						if (pid != p.pid) {
+							String name = null;
+							try {
+								name = (String) pm.getApplicationLabel(pm.getApplicationInfo(p.pkgList[0], 0));
+							} catch (PackageManager.NameNotFoundException e) {
+							} catch (Resources.NotFoundException e) {
+							}
+							if(mListSelected!=null){
+								for (int i = 0; i < mListSelected.size(); i++) {
+									if(mListSelected.get(i).get(C.pDead)!=null){
+										if(mListSelected.get(i).get(C.pPackage).equals(p.pkgList[0])){
+											mListSelected.set(i,ActivityProcesses.mapDataForPlacesList(false, name, String.valueOf(p.pid), p.pkgList[0], p.processName));
+										}
+										mListSelected.get(i).remove(C.pDead);
+									}
+
+								}
+							}
+//							mListSelected.add(ActivityProcesses.mapDataForPlacesList(false, name, String.valueOf(p.pid), p.pkgList[0], p.processName));
+						}
+					}
+				}
 				try {
 					Thread.sleep(intervalRead);
 /*					synchronized (this) {
@@ -140,11 +169,8 @@ public class ServiceReader extends Service {
 			return ServiceReader.this;
 		}
 	}
-	
-	
-	
-	
-	
+
+
 	@Override
 	public void onCreate() {
 		cpuTotal = new ArrayList<Float>(maxSamples);

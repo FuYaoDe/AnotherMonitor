@@ -9,15 +9,6 @@
 
 package org.anothermonitor;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -33,13 +24,31 @@ import android.content.res.Resources.NotFoundException;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
-import android.os.Debug.MemoryInfo;
 import android.os.Process;
-import android.util.Log;
-import android.view.*;
-import android.widget.*;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class ActivityProcesses extends Activity {
 	private int navigationBarHeight;
@@ -131,7 +140,11 @@ public class ActivityProcesses extends Activity {
 						} catch (NotFoundException e) {
 						}
 						mListProcesses.add(mapDataForPlacesList(false, name, String.valueOf(p.pid), p.pkgList[0], p.processName));
+
+//						mListSelected.add(mapDataForPlacesList(false, name, String.valueOf(p.pid), p.pkgList[0], p.processName));
 					}
+
+
 				}
 				
 				Collections.sort(mListProcesses, new Comparator<Map<String, Object>>(){
@@ -153,6 +166,8 @@ public class ActivityProcesses extends Activity {
 						}
 					}
 				}
+
+
 				
 			} else {
 				mLV.setVisibility(View.GONE);
@@ -210,7 +225,7 @@ public class ActivityProcesses extends Activity {
 	
 	
 	
-	private Map<String, Object> mapDataForPlacesList(boolean selected, String pAppName, String pid, String pPackage, String pName) {
+	public static Map<String, Object> mapDataForPlacesList(boolean selected, String pAppName, String pid, String pPackage, String pName) {
 		Map<String, Object> entry = new HashMap<String, Object>();
 		entry.put(C.pSelected, selected);
 		entry.put(C.pAppName, pAppName);
@@ -219,11 +234,11 @@ public class ActivityProcesses extends Activity {
 		entry.put(C.pName, pName);
 		return entry;
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 	@Override
 	public void onSaveInstanceState(Bundle outState)  {
 		if (mListProcesses.size() != 0)
