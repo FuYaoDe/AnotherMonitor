@@ -9,21 +9,12 @@
 
 package org.anothermonitor;
 
-import java.io.Serializable;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.LayoutTransition;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -32,7 +23,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -41,11 +31,23 @@ import android.graphics.SurfaceTexture;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.*;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
 import android.os.Process;
-import android.provider.Settings;
 import android.util.Log;
-import android.view.*;
+import android.view.Gravity;
+import android.view.HapticFeedbackConstants;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
+import android.view.TextureView;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewManager;
+import android.view.ViewStub;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -55,6 +57,14 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import java.io.Serializable;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
 public class ActivityMain extends Activity {
 
@@ -1049,31 +1059,33 @@ public class ActivityMain extends Activity {
 	
 	
 	@SuppressWarnings("unchecked")
-	private void switchParameterForProcess(Map<String, Object> process) {		
+	public void switchParameterForProcess(Map<String, Object> process) {
 		LinearLayout l = null;
 		for (int n=0; n<mLProcessContainer.getChildCount(); ++n) {
 			l = (LinearLayout) mLProcessContainer.getChildAt(n);
 			if (((Map<String, Object>) l.getTag()).get(C.pId).equals(process.get(C.pId)))
 				break;
 		}
-		ImageView iv = (ImageView) l.getChildAt(0);
-		
-		if (process.get(C.pDead) != null) {
-			((TextView) l.findViewById(R.id.TVpPercentage)).setText(getString(R.string.w_processes_dead));
-			l.findViewById(R.id.TVpName).setAlpha(0.2f);
-			l.findViewById(R.id.TVpAbsolute).setVisibility(View.INVISIBLE);
-			l.getChildAt(1).setAlpha(0.3f);
+		if(l!=null){
+			ImageView iv = (ImageView) l.getChildAt(0);
+
+			if (process.get(C.pDead) != null) {
+				((TextView) l.findViewById(R.id.TVpPercentage)).setText(getString(R.string.w_processes_dead));
+				l.findViewById(R.id.TVpName).setAlpha(0.2f);
+				l.findViewById(R.id.TVpAbsolute).setVisibility(View.INVISIBLE);
+				l.getChildAt(1).setAlpha(0.3f);
+			}
+
+			if ((Boolean) process.get(C.pSelected)) {
+				iv.setImageResource(R.drawable.icon_play);
+				if (process.get(C.pDead) == null)
+					setTextLabelCPUProcess(l);
+			} else {
+				iv.setImageResource(R.drawable.icon_pause);
+			}
+			mHandlerVG.post(drawRunnableGraphic);
 		}
-		
-		if ((Boolean) process.get(C.pSelected)) {
-			iv.setImageResource(R.drawable.icon_play);
-			if (process.get(C.pDead) == null)
-				setTextLabelCPUProcess(l);
-		} else {
-			iv.setImageResource(R.drawable.icon_pause);
-		}
-		
-		mHandlerVG.post(drawRunnableGraphic);
+
 	}
 	
 	
@@ -1183,7 +1195,7 @@ public class ActivityMain extends Activity {
 	
 	
 	
-	
+
 	
 	@SuppressLint({ "NewApi", "InflateParams" })
 	@SuppressWarnings("unchecked")

@@ -151,7 +151,18 @@ public class ServiceReader extends Service {
 				Log.d("name",bundle.getString("pkgName"));
 				String[] packageName = bundle.getString("pkgName").split(" ");
 				for (int i = 0; i < packageName.length; i++) {
-					mPackageName.add(packageName[i]);
+//					mPackageName.add(packageName[i]);
+					// Integer	   C.pId
+					// String	   C.pName
+					// Integer	   C.work
+					// Integer	   C.workBefore
+					// List<Sring> C.finalValue
+					// Boolean	   C.pDead
+					Map<String, Object> process = ActivityProcesses.mapDataForPlacesList(false, packageName[i], "-2", packageName[i], packageName[i]);
+					process.put(C.pColour, 0);
+					process.put(C.pFinalValue, new ArrayList<Float>());
+					process.put(C.pTPD, new ArrayList<Integer>());
+					addProcess(process);
 //					addProcess(ActivityProcesses.mapDataForPlacesList(false,packageName[0],"-2",packageName[0],packageName[0]));
 				}
 //				for (int i = 0; i <packageName.length ; i++) {
@@ -530,7 +541,7 @@ public class ServiceReader extends Service {
 //						.append(intervalRead)
 //						.append(",MemTotal (kB),")
 //						.append(memTotal)
-						.append("Total CPU usage (%),AnotherMonitor (Pid ").append(Process.myPid()).append(") CPU usage (%),AnotherMonitor Memory (kB)");
+						.append("Total CPU usage (%),AnotherMonitor (Pid ").append(Process.myPid()).append(" CPU usage (%),AnotherMonitor Memory (kB)");
 				if (mListSelected != null && !mListSelected.isEmpty())
 					for (Map<String, Object> p : mListSelected)
 						sb.append(",").append(p.get(C.pAppName)).append(") CPU usage (%)")
