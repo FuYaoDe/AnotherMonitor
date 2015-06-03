@@ -9,22 +9,6 @@
 
 package org.anothermonitor;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
-import java.text.DecimalFormat;
-import java.util.Calendar;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.Notification;
@@ -50,6 +34,22 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Serializable;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class ServiceReader extends Service {
 	
@@ -476,14 +476,14 @@ public class ServiceReader extends Service {
 		try {
 			if (topRow) {
 				StringBuilder sb = new StringBuilder()
-						.append(getString(R.string.app_name))
-						.append(" Record,Starting date and time:,")
-						.append(getDate())
-						.append(",Read interval (ms):,")
-						.append(intervalRead)
-						.append(",MemTotal (kB),")
-						.append(memTotal)
-						.append("\nTotal CPU usage (%),AnotherMonitor (Pid ").append(Process.myPid()).append(") CPU usage (%),AnotherMonitor Memory (kB)");
+//						.append(getString(R.string.app_name))
+//						.append(" Record,Starting date and time:,")
+//						.append(getDate())
+//						.append(",Read interval (ms):,")
+//						.append(intervalRead)
+//						.append(",MemTotal (kB),")
+//						.append(memTotal)
+						.append("Total CPU usage (%),AnotherMonitor (Pid ").append(Process.myPid()).append(") CPU usage (%),AnotherMonitor Memory (kB)");
 				if (mListSelected != null && !mListSelected.isEmpty())
 					for (Map<String, Object> p : mListSelected)
 						sb.append(",").append(p.get(C.pAppName)).append(" (Pid ").append(p.get(C.pId)).append(") CPU usage (%)")
