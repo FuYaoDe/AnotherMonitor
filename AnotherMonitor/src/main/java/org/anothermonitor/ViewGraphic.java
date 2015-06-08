@@ -9,13 +9,6 @@
 
 package org.anothermonitor;
 
-import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import android.util.AttributeSet;
-import android.view.TextureView;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -25,6 +18,13 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.util.AttributeSet;
+import android.view.TextureView;
+
+import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ViewGraphic extends TextureView {
 	
@@ -133,6 +133,7 @@ public class ViewGraphic extends TextureView {
 						paints = new HashMap<String, Paint>();
 					Paint paint = paints.get(l.get(n).get(C.pId));
 					if (paint == null) {
+
 						paint = getPaint((Integer) l.get(n).get(C.pColour), Paint.Align.CENTER, 12, false, thickParam);
 						paints.put((String) l.get(n).get(C.pId), paint);
 					}

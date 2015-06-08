@@ -425,8 +425,38 @@ public class ActivityMain extends Activity {
 		((LinearLayout) mLMenu.findViewById(R.id.LClose)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mSR.stopSelf();
-				finish();
+				LayoutInflater layoutInflater = LayoutInflater.from(ActivityMain.this);
+				final View promptView = layoutInflater.inflate(R.layout.dialog_signin, null);
+				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivityMain.this);
+				alertDialogBuilder.setView(promptView);
+
+				final EditText editText = (EditText) promptView.findViewById(R.id.check);
+				// setup a dialog window
+				alertDialogBuilder.setCancelable(false)
+						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								EditText text = (EditText)promptView.findViewById(R.id.check);
+								if(text.getText().toString().equals("admin")){
+									mSR.stopSelf();
+									finish();
+								}else{
+									text.setText("");
+								}
+
+							}
+						})
+						.setNegativeButton("Cancel",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int id) {
+										dialog.cancel();
+									}
+								});
+
+				// create an alert dialog
+				AlertDialog alert = alertDialogBuilder.create();
+				alert.show();
+
+
 			}
 		});
 		
@@ -1277,8 +1307,8 @@ public class ActivityMain extends Activity {
 			if (mListSelectedProv == null)
 				return;
 			
-			mBRemoveAll.setAlpha(1);
-			mBRemoveAll.setVisibility(View.VISIBLE);
+//			mBRemoveAll.setAlpha(1);
+//			mBRemoveAll.setVisibility(View.VISIBLE);
 			
 			synchronized (mListSelected) {
 				for (final Map<String, Object> process : mListSelectedProv) {
@@ -1301,9 +1331,9 @@ public class ActivityMain extends Activity {
 					l.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							Boolean b = (Boolean) process.get(C.pSelected);
-							process.put(C.pSelected, !b);
-							switchParameterForProcess(process);
+//							Boolean b = (Boolean) process.get(C.pSelected);
+//							process.put(C.pSelected, !b);
+//							switchParameterForProcess(process);
 							
 							/*Intent intent = new Intent();
 							intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
