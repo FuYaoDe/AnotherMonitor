@@ -157,7 +157,7 @@ public class ServiceReader extends Service {
 					// List<Sring> C.finalValue
 					// Boolean	   C.pDead
 					Map<String, Object> process = ActivityProcesses.mapDataForPlacesList(false, packageName[i], "-2", packageName[i], packageName[i]);
-					process.put(C.pColour, 0);
+					process.put(C.pColour, getResources().getColor(R.color.process3));
 					process.put(C.pFinalValue, new ArrayList<Float>());
 					process.put(C.pTPD, new ArrayList<Integer>());
 					process.put(C.work,(float)0);
@@ -255,7 +255,7 @@ public class ServiceReader extends Service {
 				.setContentIntent(contentIntent) // PendingIntent.getActivity(this, 0, new Intent(this, ActivityMain.class), 0)
 				.setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.notify_read2)))
 		        .addAction(R.drawable.icon_circle_sb, getString(R.string.menu_record), pIStartRecord)
-		        .addAction(R.drawable.icon_times_ai, getString(R.string.menu_close), pIClose)
+//		        .addAction(R.drawable.icon_times_ai, getString(R.string.menu_close), pIClose)
 				.build();
 		
 		mNotificationRecord = new NotificationCompat.Builder(this)
@@ -268,8 +268,8 @@ public class ServiceReader extends Service {
 				.setOngoing(true)
 				.setContentIntent(contentIntent)
 				.setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.notify_record2)))
-		        .addAction(R.drawable.icon_stop_sb, getString(R.string.menu_stop_record), pIStopRecord)
-		        .addAction(R.drawable.icon_times_ai, getString(R.string.menu_close), pIClose)
+//		        .addAction(R.drawable.icon_stop_sb, getString(R.string.menu_stop_record), pIStopRecord)
+//		        .addAction(R.drawable.icon_times_ai, getString(R.string.menu_close), pIClose)
 				.build();
 
 //		mNM.notify(0, mNotificationRead);

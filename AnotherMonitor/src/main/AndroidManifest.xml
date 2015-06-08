@@ -27,7 +27,6 @@
         <activity android:name=".ActivityProcesses" />
         <activity android:name=".ActivityHelp" />
         <activity android:name=".ActivityAbout" />
-
         <service android:name=".ServiceReader" />
 
     </application>

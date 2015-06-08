@@ -15,10 +15,12 @@ import android.animation.LayoutTransition;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -41,6 +43,7 @@ import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -49,6 +52,7 @@ import android.view.ViewStub;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -339,8 +343,37 @@ public class ActivityMain extends Activity {
 		mLButtonRecord.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					if (mSR.isRecording())
-						mSR.stopRecord();
+					if (mSR.isRecording()){
+						LayoutInflater layoutInflater = LayoutInflater.from(ActivityMain.this);
+						final View promptView = layoutInflater.inflate(R.layout.dialog_signin, null);
+						AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivityMain.this);
+						alertDialogBuilder.setView(promptView);
+
+						final EditText editText = (EditText) promptView.findViewById(R.id.check);
+						// setup a dialog window
+						alertDialogBuilder.setCancelable(false)
+								.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int id) {
+										EditText text = (EditText)promptView.findViewById(R.id.check);
+										if(text.getText().toString().equals("admin")){
+											mSR.stopRecord();
+										}else{
+											text.setText("");
+										}
+
+									}
+								})
+								.setNegativeButton("Cancel",
+										new DialogInterface.OnClickListener() {
+											public void onClick(DialogInterface dialog, int id) {
+												dialog.cancel();
+											}
+										});
+
+						// create an alert dialog
+						AlertDialog alert = alertDialogBuilder.create();
+						alert.show();
+					}
 					else mSR.startRecord();
 					mHandlerVG.post(drawRunnableGraphic);
 				}
@@ -489,7 +522,8 @@ public class ActivityMain extends Activity {
 		mLGraphicSurface.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				showSettings();
+//				暫時關閉設定
+//				showSettings();
 			}
 		});
 		mLGraphicSurface.setOnLongClickListener(new View.OnLongClickListener() {
@@ -1298,8 +1332,11 @@ public class ActivityMain extends Activity {
 					
 					ImageView pIcon = (ImageView) l.getChildAt(1);
 					pIcon.setImageDrawable(d);
-					
-					int colour = (Integer) process.get(C.pColour);
+
+					int colour = getColourForProcess(0);
+					if(process.get(C.pColour)!=null){
+						colour = (Integer) process.get(C.pColour);
+					}
 
 					TextView pName = (TextView) l.findViewById(R.id.TVpAppName);
 					pName.setText((String) process.get(C.pAppName));
