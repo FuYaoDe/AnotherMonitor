@@ -99,16 +99,14 @@ public class ServiceReader extends Service {
 							} catch (Resources.NotFoundException e) {
 							}
 							if(mListSelected!=null){
-								while(mPackageName.size()>0){
-									mListSelected.add(ActivityProcesses.mapDataForPlacesList(true, mPackageName.get(0), "-2",mPackageName.get(0),mPackageName.get(0)));
-									mPackageName.remove(0);
-								}
 								for (int i = 0; i < mListSelected.size(); i++) {
 									if(mListSelected.get(i).get(C.pDead)!=null){
+//										Log.d("Dead",mListSelected.get(i).get(C.pPackage).toString());
+//										Log.d("pkgList", p.pkgList[0]);
 										if(mListSelected.get(i).get(C.pPackage).equals(p.pkgList[0])){
 											mListSelected.set(i,ActivityProcesses.mapDataForPlacesList(false, name, String.valueOf(p.pid), p.pkgList[0], p.processName));
+											mListSelected.get(i).remove(C.pDead);
 										}
-										mListSelected.get(i).remove(C.pDead);
 									}
 								}
 							}
@@ -146,12 +144,12 @@ public class ServiceReader extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
 			Bundle bundle = intent.getExtras();
+			Log.d("Broadcast","start");
 			if(bundle != null && bundle.containsKey("pkgName"))
 			{
 				Log.d("name",bundle.getString("pkgName"));
 				String[] packageName = bundle.getString("pkgName").split(" ");
 				for (int i = 0; i < packageName.length; i++) {
-//					mPackageName.add(packageName[i]);
 					// Integer	   C.pId
 					// String	   C.pName
 					// Integer	   C.work
@@ -162,6 +160,9 @@ public class ServiceReader extends Service {
 					process.put(C.pColour, 0);
 					process.put(C.pFinalValue, new ArrayList<Float>());
 					process.put(C.pTPD, new ArrayList<Integer>());
+					process.put(C.work,(float)0);
+					process.put(C.workBefore,(float)0);
+					process.put(C.pDead,Boolean.TRUE);
 					addProcess(process);
 //					addProcess(ActivityProcesses.mapDataForPlacesList(false,packageName[0],"-2",packageName[0],packageName[0]));
 				}
@@ -541,11 +542,11 @@ public class ServiceReader extends Service {
 //						.append(intervalRead)
 //						.append(",MemTotal (kB),")
 //						.append(memTotal)
-						.append("Total CPU usage (%),AnotherMonitor (Pid ").append(Process.myPid()).append(" CPU usage (%),AnotherMonitor Memory (kB)");
+						.append("Total CPU usage (%),AnotherMonitor (Pid ").append(Process.myPid()).append(") CPU usage (%),AnotherMonitor Memory (kB)");
 				if (mListSelected != null && !mListSelected.isEmpty())
 					for (Map<String, Object> p : mListSelected)
-						sb.append(",").append(p.get(C.pAppName)).append(") CPU usage (%)")
-						  .append(",").append(p.get(C.pAppName)).append(" Memory (kB)");
+						sb.append(",").append(p.get(C.pPackage)).append(" CPU usage (%)")
+						  .append(",").append(p.get(C.pPackage)).append(" Memory (kB)");
 				
 				sb.append(",,Memory used (kB),Memory available (MemFree+Cached) (kB),MemFree (kB),Cached (kB),Threshold (kB)");
 			
@@ -561,7 +562,7 @@ public class ServiceReader extends Service {
 			if (mListSelected != null && !mListSelected.isEmpty())
 				for (Map<String, Object> p : mListSelected) {
 					if (p.get(C.pDead) != null)
-						sb.append(",DEAD,DEAD");
+						sb.append(",-1,-1");
 					else sb.append(",").append(((List<Integer>) p.get(C.pFinalValue)).get(0))
 							.append(",").append(((List<Integer>) p.get(C.pTPD)).get(0));
 				}
