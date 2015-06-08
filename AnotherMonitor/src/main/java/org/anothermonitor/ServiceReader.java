@@ -542,7 +542,7 @@ public class ServiceReader extends Service {
 //						.append(intervalRead)
 //						.append(",MemTotal (kB),")
 //						.append(memTotal)
-						.append("Total CPU usage (%),AnotherMonitor (Pid ").append(Process.myPid()).append(") CPU usage (%),AnotherMonitor Memory (kB)");
+						.append("SystemTime,Time,Total CPU usage (%),AnotherMonitor (Pid ").append(Process.myPid()).append(") CPU usage (%),AnotherMonitor Memory (kB)");
 				if (mListSelected != null && !mListSelected.isEmpty())
 					for (Map<String, Object> p : mListSelected)
 						sb.append(",").append(p.get(C.pPackage)).append(" CPU usage (%)")
@@ -554,17 +554,24 @@ public class ServiceReader extends Service {
 				mNM.notify(10, mNotificationRecord);
 				topRow = false;
 			}
-			
+
 			StringBuilder sb = new StringBuilder()
-					.append("\n").append(cpuTotal.get(0))
+					.append("\n").append(System.currentTimeMillis())
+					.append(",").append(getDate())
+					.append(",").append(cpuTotal.get(0))
 					.append(",").append(cpuAM.get(0))
 					.append(",").append(memoryAM.get(0));
+			Log.d("Total CPU usage", cpuTotal.get(0) + "%");
 			if (mListSelected != null && !mListSelected.isEmpty())
 				for (Map<String, Object> p : mListSelected) {
 					if (p.get(C.pDead) != null)
 						sb.append(",-1,-1");
-					else sb.append(",").append(((List<Integer>) p.get(C.pFinalValue)).get(0))
-							.append(",").append(((List<Integer>) p.get(C.pTPD)).get(0));
+					else {
+						sb.append(",").append(((List<Integer>) p.get(C.pFinalValue)).get(0))
+								.append(",").append(((List<Integer>) p.get(C.pTPD)).get(0));
+						Log.d(p.get(C.pPackage) + " CPU usage", ((List<Integer>) p.get(C.pFinalValue)).get(0) + "%");
+						Log.d(p.get(C.pPackage)+" Memory usage",((List<Integer>) p.get(C.pTPD)).get(0)+"KB");
+					}
 				}
 			sb.append(",")
 					.append(",").append(memUsed.get(0))
@@ -572,6 +579,7 @@ public class ServiceReader extends Service {
 					.append(",").append(memFree.get(0))
 					.append(",").append(cached.get(0))
 					.append(",").append(threshold.get(0));
+			Log.d("All Memory usage", memUsed.get(0) + "KB");
 			
 			mW.write(sb.toString());
 		} catch (IOException e) {
